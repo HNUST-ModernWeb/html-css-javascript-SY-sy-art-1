@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>个人资料卡片</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .card {
+            width: 350px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #409eff;
+            margin-bottom: 16px;
+            cursor: pointer;
+        }
+
+        .name {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .info {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .desc {
+            font-size: 13px;
+            color: #888;
+            margin: 14px 0 20px;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 20px;
+            background-color: #409eff;
+            color: #fff;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            background-color: #337ecc;
+        }
+
+        /* 编辑表单样式 */
+        .edit-form {
+            width: 350px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .edit-form input, .edit-form textarea {
+            width: 100%;
+            padding: 8px 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .edit-form textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        #avatarInput {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card" id="card">
+        <!-- 点击头像可以上传图片 -->
+        <label for="avatarInput">
+            <img src="https://picsum.photos/200/200" alt="头像" class="avatar">
+        </label>
+        <div class="name" id="nameText">赵宇</div>
+        <div class="info">学生</div>
+        <div class="info">坐标：中国</div>
+        <div class="desc" id="descText">
+热爱编程、喜欢做网页，正在努力学习 HTML、CSS、JavaScript，
+不断提升自己的前端技能。
+        </div>
+
+        <button class="btn" onclick="showEdit()">编辑资料</button>
+        <button class="btn" onclick="saveData()">保存</button>
+    </div>
+
+    <!-- 编辑表单 -->
+    <div class="edit-form" id="editForm">
+        <input type="text" id="nameInput" placeholder="输入姓名"><br>
+        <textarea id="descInput" placeholder="输入个人简介"></textarea><br>
+    </div>
+
+    <!-- 头像上传 -->
+    <input type="file" id="avatarInput" accept="image/*">
+
+<script>
+// 加载本地保存的数据
+window.onload = function(){
+    if(localStorage.name){
+        document.getElementById('nameText').innerText = localStorage.name;
+        document.getElementById('descText').innerText = localStorage.desc;
+    }
+    if(localStorage.avatar){
+        document.getElementById('avatar').src = localStorage.avatar;
+    }
+}
+
+// 显示编辑框
+function showEdit(){
+    let name = document.getElementById('nameText').innerText;
+    let desc = document.getElementById('descText').innerText;
+    document.getElementById('nameInput').value = name;
+    document.getElementById('descInput').value = desc;
+    document.getElementById('editForm').style.display = 'block';
+}
+
+// 保存资料
+function saveData(){
+    let name = document.getElementById('nameInput').value;
+    let desc = document.getElementById('descInput').value;
+    if(name){
+        document.getElementById('nameText').innerText = name;
+        localStorage.name = name;
+    }
+    if(desc){
+        document.getElementById('descText').innerText = desc;
+        localStorage.desc = desc;
+    }
+    document.getElementById('editForm').style.display = 'none';
+    alert('保存成功！');
+}
+
+// 头像上传预览
+document.getElementById('avatarInput').addEventListener('change', function(e){
+    let file = e.target.files[0];
+    if(!file) return;
+    let reader = new FileReader();
+    reader.onload = function(){
+        let url = reader.result;
+        document.getElementById('avatar').src = url;
+        localStorage.avatar = url;
+    }
+    reader.readAsDataURL(file);
+});
+</script>
+
+</body>
+</html>
