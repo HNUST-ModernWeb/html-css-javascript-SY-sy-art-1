@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>简易微博</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background: #f5f7fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .publish {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        textarea {
+            width: 100%;
+            height: 80px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            resize: none;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background: #409eff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .post {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .post img {
+            max-width: 100%;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+
+        .like {
+            color: #666;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="publish">
+        <textarea id="content" placeholder="分享点什么..."></textarea><br>
+        <input type="file" id="image" accept="image/*"><br>
+        <button onclick="publish()">发布</button>
+    </div>
+
+    <div id="postList"></div>
+</div>
+
+<script>
+    // 后端地址
+    const base = "http://localhost:8080/api/weibo";
+
+    // 发布
+    async function publish() {
+        let content = document.getElementById("content").value;
+        let image = document.getElementById("image").files[0];
+
+        let form = new FormData();
+        form.append("content", content);
+        if (image) form.append("image", image);
+
+        let res = await fetch(base + "/publish", { method: "POST", body: form });
+        loadPosts();
+    }
+
+    // 加载帖子
+    async function loadPosts() {
+        let res = await fetch(base + "/posts");
+        let list = await res.json();
+        let html = "";
+        list.forEach(p => {
+            html += `
+            <div class="post">
+                <div>${p.content}</div>
+                ${p.imageUrl ? `<img src="${p.imageUrl}">` : ""}
+                <div class="like" onclick="like(${p.id})">👍 ${p.like}</div>
+            </div>`;
+        });
+        document.getElementById("postList").innerHTML = html;
+    }
+
+    // 点赞
+    async function like(id) {
+        await fetch(base + "/like/" + id, { method: "POST" });
+        loadPosts();
+    }
+
+    loadPosts();
+</script>
+
+</body>
+</html>
